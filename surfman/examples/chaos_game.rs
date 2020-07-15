@@ -6,7 +6,7 @@ use euclid::default::Point2D;
 use rand::{self, Rng};
 use surfman::{SurfaceAccess, SurfaceType};
 use winit::dpi::PhysicalSize;
-use winit::{DeviceEvent, Event, EventsLoop, KeyboardInput, VirtualKeyCode};
+use winit::{Event, EventsLoop, KeyboardInput, VirtualKeyCode};
 use winit::{WindowBuilder, WindowEvent};
 
 #[cfg(target_os = "macos")]
@@ -71,16 +71,21 @@ fn main() {
         event_loop.poll_events(|event| {
             match event {
                 Event::WindowEvent { event: WindowEvent::Destroyed, .. } |
-                Event::DeviceEvent {
-                    event: DeviceEvent::Key(KeyboardInput {
-                        virtual_keycode: Some(VirtualKeyCode::Escape),
+                Event::WindowEvent { event: WindowEvent::CloseRequested, .. } |
+                Event::WindowEvent {
+                    event: WindowEvent::KeyboardInput {
+                        input: KeyboardInput {
+                            virtual_keycode: Some(VirtualKeyCode::Escape),
+                            ..
+                        },
                         ..
-                    }),
+                    },
                     ..
                 } => exit = true,
                 _ => {}
             }
         });
+        device.destroy_surface(&mut surface).unwrap();
     }
 }
 
